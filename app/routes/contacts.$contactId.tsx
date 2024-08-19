@@ -2,13 +2,14 @@ import { Form } from '@remix-run/react'
 import type { ContactRecord } from '../contacts'
 
 export default function Contact() {
-  const contact = {
+  const contact: ContactRecord = {
+    id: 'q16wdyp',
     first: 'Your',
     last: 'Name',
-    avatar: 'https://placekitten.com/200/200',
     twitter: 'your_handle',
     notes: 'Some notes',
     favorite: true,
+    createdAt: '2024-08-19T09:12:46.175Z',
   }
 
   return (
@@ -17,7 +18,10 @@ export default function Contact() {
         <img
           alt={`${contact.first} ${contact.last} avatar`}
           key={contact.avatar}
-          src={contact.avatar}
+          src={
+            contact.avatar ||
+            `https://robohash.org/${contact.id}.png?size=200x200`
+          }
         />
       </div>
       <div>
