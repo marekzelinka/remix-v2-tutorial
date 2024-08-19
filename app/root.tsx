@@ -19,7 +19,7 @@ export async function loader() {
 }
 
 export function Layout({ children }: { children: ReactNode }) {
-  const { contacts } = useLoaderData()
+  const { contacts } = useLoaderData<typeof loader>()
 
   return (
     <html lang="en">
