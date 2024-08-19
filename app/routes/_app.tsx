@@ -11,7 +11,7 @@ export default function App() {
   const { contacts } = useLoaderData<typeof loader>()
 
   return (
-    <div id="app">
+    <>
       <div id="sidebar">
         <h1>Remix Contacts</h1>
         <div>
@@ -60,6 +60,6 @@ export default function App() {
       <div id="detail">
         <Outlet />
       </div>
-    </div>
+    </>
   )
 }
