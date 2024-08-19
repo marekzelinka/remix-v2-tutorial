@@ -1,7 +1,6 @@
-import { json, redirect } from '@remix-run/node'
+import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
 import {
   Form,
-  Link,
   Links,
   Meta,
   NavLink,
@@ -10,25 +9,38 @@ import {
   ScrollRestoration,
   useLoaderData,
   useNavigation,
+  useSubmit,
 } from '@remix-run/react'
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { createEmptyContact, getContacts } from './contacts'
 import './index.css'
 
-export async function loader() {
-  const contacts = await getContacts()
-  return json({ contacts })
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url)
+  const q = url.searchParams.get('q')
+  const contacts = await getContacts(q)
+  return json({ contacts, q })
 }
-
 export async function action() {
   const contact = await createEmptyContact()
   return redirect(`/contacts/${contact.id}/edit`)
 }
 
 export function Layout({ children }: { children: ReactNode }) {
-  const { contacts } = useLoaderData<typeof loader>()
+  const { contacts, q } = useLoaderData<typeof loader>()
 
   const navigation = useNavigation()
+  const submit = useSubmit()
+  const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has('q')
+
+  useEffect(() => {
+    const searchField = document.getElementById('q')
+    if (searchField instanceof HTMLInputElement) {
+      searchField.value = q || ''
+    }
+  }, [q])
 
   return (
     <html lang="en">
@@ -42,15 +54,26 @@ export function Layout({ children }: { children: ReactNode }) {
         <div id="sidebar">
           <h1>Remix Contacts</h1>
           <div>
-            <Form id="search-form" role="search">
+            <Form
+              id="search-form"
+              onChange={(event) => {
+                const isFirstSearch = q === null
+                submit(event.currentTarget, {
+                  replace: !isFirstSearch,
+                })
+              }}
+              role="search"
+            >
               <input
                 id="q"
                 aria-label="Search contacts"
                 placeholder="Search"
                 type="search"
                 name="q"
+                defaultValue={q || ''}
+                className={searching ? 'loading' : ''}
               />
-              <div id="search-spinner" aria-hidden hidden={true} />
+              <div id="search-spinner" aria-hidden hidden={!searching} />
             </Form>
             <Form method="post">
               <button type="submit">New</button>
@@ -78,9 +101,6 @@ export function Layout({ children }: { children: ReactNode }) {
                     </NavLink>
                   </li>
                 ))}
-                <li>
-                  <Link to={`/contacts/2`}>Your Friend</Link>
-                </li>
               </ul>
             ) : (
               <p>
@@ -91,7 +111,9 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
         <div
           id="detail"
-          className={navigation.state === 'loading' ? 'loading' : ''}
+          className={
+            navigation.state === 'loading' && !searching ? 'loading' : ''
+          }
         >
           {children}
         </div>
