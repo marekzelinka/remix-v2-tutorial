@@ -9,7 +9,6 @@ import {
 import type { ReactNode } from 'react'
 import './index.css'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
@@ -48,6 +47,7 @@ export function Layout({ children }: { children: ReactNode }) {
             </ul>
           </nav>
         </div>
+        <div id="detail">{children}</div>
         <ScrollRestoration />
         <Scripts />
       </body>
