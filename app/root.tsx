@@ -1,6 +1,6 @@
+import { json } from '@remix-run/node'
 import {
   Form,
-  json,
   Link,
   Links,
   Meta,
