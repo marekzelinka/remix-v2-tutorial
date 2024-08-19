@@ -312,5 +312,6 @@ export async function deleteContact(id: string) {
   fakeContacts.create({
     ...contact,
     id: `${contact.first.toLowerCase()}-${contact.last.toLocaleLowerCase()}`,
+    favorite: Math.random() < 0.5,
   })
 })
